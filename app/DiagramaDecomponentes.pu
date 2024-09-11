@@ -1,0 +1,31 @@
+@startuml
+skinparam componentStyle rectangle
+
+package "Backend" {
+    [SmartMusaAPI] <<Laravel>>
+    [Base de Datos MySQL] <<MySQL>>
+}
+
+package "Frontend" {
+    [SmartMusa Web] <<JavaScript Vanilla>>
+    [SmartMusa App] <<Angular>>
+}
+
+package "Dispositivos IoT" {
+    [Arduino] <<Microcontrolador>>
+    [Sensor de Humedad Relativa]
+    [Sensor de Temperatura]
+    [Sensor de Humedad del Suelo]
+}
+
+[Arduino] --> [SmartMusaAPI] : Peticiones HTTP
+
+[SmartMusaAPI] --> [Base de Datos MySQL] : Lectura/Escritura
+[SmartMusa Web] --> [SmartMusaAPI] : Peticiones HTTP
+[SmartMusa App] --> [SmartMusaAPI] : Peticiones HTTP
+
+[Sensor de Humedad Relativa] --> [Arduino]
+[Sensor de Temperatura] --> [Arduino]
+[Sensor de Humedad del Suelo] --> [Arduino]
+
+@enduml

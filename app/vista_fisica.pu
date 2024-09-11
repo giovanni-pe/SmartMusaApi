@@ -1,0 +1,36 @@
+@startuml
+title Diagrama de Despliegue Sistema Smart Musa
+skinparam componentStyle rectangle
+
+node "Android" {
+}
+
+node "Tablet" {
+}
+
+node "Desktop" {
+}
+
+node "CDN de Cloudflare" {
+    [SmartMusa Web] <<JavaScript Vanilla>>
+    [SmartMusa App] <<Angular>>
+}
+
+node "AWS" {
+    [SmartMusaAPI] <<Laravel>>
+    [Base de Datos MySQL] <<MySQL>>
+}
+
+node "Dispositivo Arduino" {
+}
+
+"Android" --> "CDN de Cloudflare" : HTTP
+"Tablet" --> "CDN de Cloudflare" : HTTP
+"Desktop" --> "CDN de Cloudflare" : HTTP
+
+"Dispositivo Arduino" --> [SmartMusaAPI] : HTTP
+"CDN de Cloudflare" --> [SmartMusaAPI] : HTTP
+[SmartMusaAPI] --> [Base de Datos MySQL] : Lectura/Escritura
+
+@enduml
+
