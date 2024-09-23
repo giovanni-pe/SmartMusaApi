@@ -18,7 +18,7 @@ return [
 
     'allowed_methods' => ['*'], // Allow all methods (GET, POST, PUT, DELETE, etc.)
 
-    'allowed_origins' => ['http://localhost:4200'], // Allow requests from Angular app
+    'allowed_origins' => ['http://localhost:4200','http://127.0.0.1:5500'], // Allow requests from Angular app
 
     'allowed_origins_patterns' => [],
 

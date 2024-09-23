@@ -87,23 +87,43 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        // Validar los datos del request
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|min:6',
         ]);
+    
+        // Si la validación falla, retornar los errores
         if($validator->fails()){
-            return response()->json($validator->errors()->toJson(),400);
+            return response()->json($validator->errors()->toJson(), 400);
         }
-
+    
+        // Crear el usuario
         $user = User::create(array_merge(
             $validator->validate(),
             ['password' => bcrypt($request->password)]
         ));
-
-        return response()->json([
-            'message' => '¡Usuario registrado exitosamente!',
-            'user' => $user
-        ], 201);
+    
+        // Si se crea el usuario correctamente
+        if($user){
+            // Autenticar al usuario para generar el JWT
+            $credentials = request(['email', 'password']);
+    
+            // Intentar autenticar usando las credenciales
+            if (! $token = auth()->attempt($credentials)) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+    
+            // Retornar el token junto con el usuario
+            return response()->json([
+                'message' => '¡Usuario registrado exitosamente!',
+                'token' => $this->respondWithToken($token) // Retornar el token generado
+            ], 201);
+        }
+    
+        // Si no se crea el usuario, retornar un error genérico
+        return response()->json(['message' => 'Error al registrar el usuario'], 500);
     }
+    
 }

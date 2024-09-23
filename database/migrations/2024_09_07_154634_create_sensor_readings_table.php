@@ -19,7 +19,7 @@ class CreateSensorReadingsTable extends Migration
             $table->double('relative_humidity', 8, 2);
             $table->double('soil_humidity', 8, 2);
             $table->double('ambient_temperature', 8, 2);
-            $table->foreignId('sensor_id')->constrained()->onDelete('cascade');
+            $table->foreignId('sensor_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

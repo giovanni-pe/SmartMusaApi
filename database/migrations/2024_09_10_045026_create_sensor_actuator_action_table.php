@@ -19,8 +19,9 @@ class CreateSensorActuatorActionTable extends Migration
             $table->dateTime('start_time');  
             $table->dateTime('end_time')->nullable();  
             $table->timestamps();  
-            $table->foreignId('sensor_id')->constrained()->onDelete('cascade');
-            $table->foreignId('actuator_id')->constrained()->onDelete('cascade');
+            $table->foreignId('sensor_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('actuator_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
+            $table->softDeletes();
         });
     }
 

@@ -18,7 +18,7 @@ class CreateSensorsTable extends Migration
             $table->string('type');
             $table->boolean('status')->default(true);
             $table->boolean('irrigation_status')->default(true);
-            $table->foreignId('greenhouse_id')->constrained()->onDelete('cascade');
+            $table->foreignId('greenhouse_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  * @package App
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
-class GreenHouse extends Model
+class Greenhouse extends Model
 {
     /**
      * Number of records per page for pagination.

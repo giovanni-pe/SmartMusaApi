@@ -7,6 +7,11 @@ use App\Http\Controllers\API\SensorReadingApiController;
 use App\Http\Controllers\API\CropApiController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\ActuatorController;
+use App\Http\Controllers\CommerceAPI\ProductController;
+use App\Http\Controllers\CommerceAPI\OrderController;
+use App\Http\Controllers\CommerceAPI\PaymentController;
+use App\Http\Controllers\CommerceAPI\CustomerController;
+
 // Route to get the authenticated user
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
@@ -78,3 +83,23 @@ Route::middleware('auth:api')->group(function () {
 Route::middleware('auth:api')->group(function () {       
     Route::put('/sensor/{sensor_id}/irrigation-status', [ActuatorController::class, 'updateIrrigationStatus']);
 });
+
+
+
+
+//Cusotomer
+Route::post('/customer/register', [CustomerController::class, 'register']);
+
+// Products
+Route::get('/products', [ProductController::class, 'index']);       // List all products
+Route::get('/products/{id}', [ProductController::class, 'show']);   // Show a specific product
+
+// Orders
+Route::post('/orders', [OrderController::class, 'store']);          // Create a new order
+Route::get('/orders', [OrderController::class, 'index']);           // List all orders (optional)
+Route::get('/orders/{id}', [OrderController::class, 'show']);       // Show a specific order
+
+// Payments
+Route::post('/payments', [PaymentController::class, 'store']);      // Process a payment
+
+Route::post('/products', [ProductController::class, 'store']);

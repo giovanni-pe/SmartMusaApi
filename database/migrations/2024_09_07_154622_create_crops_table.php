@@ -22,7 +22,7 @@ class CreateCropsTable extends Migration
             $table->double('max_supported_temperature', 8, 2);
             $table->double('min_supported_temperature', 8, 2);
             $table->double('status', 8, 2);
-            $table->foreignId('greenhouse_id')->constrained()->onDelete('cascade');
+            $table->foreignId('greenhouse_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }
