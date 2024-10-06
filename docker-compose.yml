@@ -5,46 +5,60 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: smartmusa-app
-    working_dir: /var/www
-    volumes:
-      - .:/var/www
-      - ./vendor:/var/www/vendor
-      - ./node_modules:/var/www/node_modules
+    container_name: laravel-app
     ports:
       - "8000:80"
-    networks:
-      - app-network
-    depends_on:
-      - db
+    volumes:
+      - .:/var/www/html
     environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
+      - APP_ENV=${APP_ENV:-local}
+      - APP_DEBUG=${APP_DEBUG:-true}
       - APP_KEY=${APP_KEY}
-      - DB_CONNECTION=mysql
-      - DB_HOST=db
-      - DB_PORT=3306
+      - DB_CONNECTION=${DB_CONNECTION}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
       - DB_DATABASE=${DB_DATABASE}
-      - DB_USERNAME=root
+      - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+    env_file:
+      - ${ENV_FILE:-.env}  # Se usará el archivo .env por defecto
+    networks:
+      - laravel
+    depends_on:
+      - mysql
+      - redis
+    
 
-  db:
+  mysql:
     image: mysql:8.0
-    container_name: smartmusa-db
+    container_name: mysql
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: root_password   # Establece la contraseña del usuario root
-      MYSQL_DATABASE: ${DB_DATABASE}       # Crea la base de datos especificada
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_KEY=base64:7/oGbYPJfRr2UN/xP9I/W79XmdTqIDD9LAWlrBibVjY=
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql          # Cambia 'localhost' por 'mysql'
+      - DB_PORT=3306
+      - DB_DATABASE=laravel
+      - DB_USERNAME=root
+      - DB_PASSWORD=password
     volumes:
-      - dbdata:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
     networks:
-      - app-network
+      - laravel
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - laravel
 
 volumes:
-  dbdata:
-    driver: local
+  mysql_data:
 
 networks:
-  app-network:
-    driver: bridge
+  laravel:

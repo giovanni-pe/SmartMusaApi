@@ -1,43 +1,68 @@
-# Use an official PHP image with extensions for Laravel
+# Usa PHP 8.1 con FPM
 FROM php:8.1-fpm
 
-# Install system dependencies
+# Establecer variables de entorno necesarias
+ENV APP_ENV=local
+ENV APP_DEBUG=true
+ENV APP_KEY=base64:7/oGbYPJfRr2UN/xP9I/W79XmdTqIDD9LAWlrBibVjY=
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV COMPOSER_HOME=/composer
+
+# Instalar dependencias del sistema y extensiones de PHP
 RUN apt-get update && apt-get install -y \
     git \
     curl \
+    zip \
+    unzip \
     libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     libonig-dev \
     libxml2-dev \
-    zip \
-    unzip
+    libzip-dev \
+    libxslt-dev \
+    nginx \
+    supervisor \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
-# Install Composer globally
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Instalar Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Install PHP extensions required for Laravel
-RUN docker-php-ext-install pdo_mysql mbstring bcmath
+# Establecer directorio de trabajo
+WORKDIR /var/www/html
 
-# Increase PHP memory limit
-RUN echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/memory-limit.ini
-
-# Set working directory
-WORKDIR /app
-
-# Copy composer files
+# Copiar el archivo composer.json y composer.lock primero para aprovechar la cache de Docker
 COPY composer.json composer.lock ./
 
-# Install PHP dependencies without executing scripts, adding verbose for more output
-RUN composer install --no-scripts --no-dev --prefer-dist --verbose
+# Instalar dependencias de Composer sin autoload (opcional)
+RUN composer install --no-autoloader
 
-# Copy the rest of the application code
+# Copiar el resto de los archivos de la aplicación
 COPY . .
 
-# Ensure proper permissions for storage and cache directories
-RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache \
-    && chmod -R 775 /app/storage /app/bootstrap/cache
+# Establecer permisos adecuados
+RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 755 /var/www/html
 
-# Expose port 80 for the application
+# Generar autoload de Composer
+RUN composer dump-autoload
+
+# Generar clave de aplicación (si no está configurada)
+RUN if [ -z "$APP_KEY" ] ; then \
+      php artisan key:generate ; \
+    fi
+
+# Configurar Nginx
+COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+
+# Copiar el archivo de configuración de supervisord
+COPY ./supervisord.conf /etc/supervisord.conf
+
+# Exponer el puerto 80 para servir la aplicación
 EXPOSE 80
 
-# Start the application using artisan serve
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=80"]
+
+
+# Ejecutar Nginx y PHP-FPM con Supervisor
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

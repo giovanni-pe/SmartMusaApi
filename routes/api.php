@@ -91,13 +91,10 @@ Route::middleware('auth:api')->group(function () {
 Route::post('/customer/register', [CustomerController::class, 'register']);
 
 // Products
-Route::get('/products', [ProductController::class, 'index']);       // List all products
-Route::get('/products/{id}', [ProductController::class, 'show']);   // Show a specific product
+Route::resource('products',App\Http\Controllers\CommerceAPI\ProductController::class);   // Show a specific product
 
 // Orders
-Route::post('/orders', [OrderController::class, 'store']);          // Create a new order
-Route::get('/orders', [OrderController::class, 'index']);           // List all orders (optional)
-Route::get('/orders/{id}', [OrderController::class, 'show']);       // Show a specific order
+Route::resource('orders',App\Http\Controllers\CommerceAPI\OrderController::class);  
 
 // Payments
 Route::post('/payments', [PaymentController::class, 'store']);      // Process a payment

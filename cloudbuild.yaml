@@ -1,0 +1,21 @@
+substitutions:
+  _IMAGE_URI: "us-central1-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:latest"
+  _REPO: "laravel-app-repo"
+  _IMAGE_NAME: "laravel-app"
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        '${_IMAGE_URI}',
+        '.',
+        '--build-arg',
+        'APP_ENV=production',
+      ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '${_IMAGE_URI}']
+
+images:
+  - '${_IMAGE_URI}'
